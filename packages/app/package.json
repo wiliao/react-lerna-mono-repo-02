@@ -1,5 +1,5 @@
 {
-  "name": "server-api",
+  "name": "@demo/app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,5 +9,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@demo/common": "*",
+    "cors": "^2.8.6",
+    "express": "^4.21.2"
+  }
 }

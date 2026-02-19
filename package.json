@@ -13,9 +13,25 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "lerna run start",
+    "start:app": "lerna run start --scope=@demo/app",
+    "start:web": "lerna run start --scope=@demo/web",
     "test": "lerna run test",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff"
-  }
+  },
+  "version": "1.0.0",
+  "description": "A mono repo with independent packages",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wiliao/react-lerna-mono-repo-02.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wiliao/react-lerna-mono-repo-02/issues"
+  },
+  "homepage": "https://github.com/wiliao/react-lerna-mono-repo-02#readme"
 }
