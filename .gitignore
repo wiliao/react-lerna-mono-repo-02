@@ -1,1 +1,13 @@
+# TypeScript build info
+**/tsconfig.tsbuildinfo
+
+# Build outputs
+**/dist/
+
+# Node modules
 node_modules/
+packages/app/tsconfig.tsbuildinfo
+packages/web/jest.config.d.ts
+packages/web/jest.config.d.ts.map
+packages/web/jest.config.js
+packages/web/jest.config.js.map

@@ -1,11 +1,17 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "./store/actions";
-import { APP_NAME } from "@demo/common";
+import { APP_NAME, User } from "@demo/common";
+import { AppDispatch, RootState } from "./store";
+
+interface FormattedUser {
+  raw: User;
+  formatted: string;
+}
 
 function App() {
-  const dispatch = useDispatch();
-  const { users, loading } = useSelector((state) => state);
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, loading } = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -20,7 +26,7 @@ function App() {
         <p>Loading users from backend...</p>
       ) : (
         <ul>
-          {users.map((user, idx) => (
+          {users.map((user: FormattedUser, idx: number) => (
             <li key={idx} style={{ marginBottom: "10px" }}>
               <strong>{user.formatted}</strong>
               <br />

@@ -2,8 +2,10 @@
   "name": "@demo/web",
   "version": "1.0.0",
   "scripts": {
+    "clean": "rimraf dist",
     "start": "webpack serve --mode development --open",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@demo/common": "*",
@@ -11,16 +13,23 @@
     "react-dom": "^19.0.0",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
-    "redux-thunk": "^3.1.0"
+    "redux-thunk": "^3.1.0",
+    "@reduxjs/toolkit": "^2.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.25.2",
     "babel-loader": "^9.2.1",
+    "@types/node": "^22.13.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "html-webpack-plugin": "^5.6.0",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
+    "webpack-dev-server": "^5.1.0",
+    "@types/jest": "^29.5.14",
+    "@testing-library/react": "^16.0.0"
   }
 }

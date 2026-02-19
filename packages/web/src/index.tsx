@@ -5,7 +5,13 @@ import App from "./App";
 import store from "./store";
 
 const container = document.getElementById("root");
-// React 18/19 createRoot API
+
+if (!container) {
+  throw new Error(
+    "Root element not found. Make sure index.html has a <div id='root'>.",
+  );
+}
+
 const root = createRoot(container);
 
 root.render(

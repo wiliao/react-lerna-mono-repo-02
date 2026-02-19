@@ -10,12 +10,21 @@
   },
   "devDependencies": {
     "lerna": "^8.1.9",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "typescript": "^5.7.3",
+    "@types/node": "^22.13.1",
+    "@types/express": "^5.0.0",
+    "@types/body-parser": "^1.19.5",
+    "rimraf": "^6.0.1"
   },
   "scripts": {
     "start:app": "lerna run start --scope=@demo/app",
     "start:web": "lerna run start --scope=@demo/web",
     "test": "lerna run test",
+    "build": "lerna run build --scope=@demo/common && lerna run build --ignore=@demo/common",
+    "clean": "lerna run clean",
+    "rebuild": "npm run clean && npm run build",
+    "typecheck": "lerna run typecheck",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff"
   },
@@ -29,7 +38,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/wiliao/react-lerna-mono-repo-02/issues"
   },
