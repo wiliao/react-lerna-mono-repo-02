@@ -11,3 +11,6 @@ packages/web/jest.config.d.ts
 packages/web/jest.config.d.ts.map
 packages/web/jest.config.js
 packages/web/jest.config.js.map
+
+# qodo
+.qodo/
