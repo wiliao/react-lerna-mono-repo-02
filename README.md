@@ -49,7 +49,7 @@ npm run rebuild
 npm run start:web
 
 # Start backend (new terminal)
-cd packages/app && npm run start:dev
+npm run start:app
 
 # Type check
 npm run typecheck
