@@ -9,37 +9,32 @@
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "lerna": "^8.1.9",
-    "web-vitals": "^4.2.4",
-    "typescript": "^5.7.3",
-    "@types/node": "^22.13.1",
-    "@types/express": "^5.0.0",
     "@types/body-parser": "^1.19.5",
-    "rimraf": "^6.0.1"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.1",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "lerna": "^8.1.9",
+    "rimraf": "^6.0.1",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "web-vitals": "^4.2.4"
   },
   "scripts": {
     "start:app": "lerna run start --scope=@demo/app",
     "start:web": "lerna run start --scope=@demo/web",
     "test": "lerna run test",
+    "test:app": "lerna run test --scope=@demo/app",
+    "test:watch:app": "lerna run test:watch --scope=@demo/app",
     "build": "lerna run build --scope=@demo/common && lerna run build --ignore=@demo/common",
     "clean": "lerna run clean",
     "rebuild": "npm run clean && npm run build",
     "typecheck": "lerna run typecheck",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff"
-  },
-  "version": "1.0.0",
-  "description": "A mono repo with independent packages",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wiliao/react-lerna-mono-repo-02.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/wiliao/react-lerna-mono-repo-02/issues"
-  },
-  "homepage": "https://github.com/wiliao/react-lerna-mono-repo-02#readme"
+  }
 }
