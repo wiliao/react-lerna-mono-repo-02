@@ -8,7 +8,8 @@
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests"
   },
   "keywords": [],
   "author": "",
