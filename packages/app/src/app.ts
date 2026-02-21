@@ -1,5 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import morgan from "morgan";
+import { logger } from "./logger";
 import { APP_NAME, formatUser, User } from "@demo/common";
 import { config } from "./config";
 
@@ -22,15 +24,14 @@ export function createApp() {
 
   app.use(express.json());
 
-  // ✅ Request logger - teaches how middleware works:
-  // every request passes through here before hitting any route handler
-  // In production you'd replace this with a library like `morgan`
-  app.use((req: Request, _res: Response, next: NextFunction) => {
-    if (config.isDev) {
-      console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    }
-    next(); // ✅ always call next() or the request hangs forever
-  });
+  app.use(
+    morgan(config.isDev ? "dev" : "combined", {
+      // ✅ Pipe morgan output into winston instead of stdout directly
+      stream: {
+        write: (message: string) => logger.http(message.trim()),
+      },
+    }),
+  );
 
   // ─────────────────────────────────────────────────────────────
   // 🗄️ Mock Data
@@ -132,7 +133,7 @@ export function createApp() {
       // 201 Created = new resource was successfully created (not 200)
       res.status(201).json({ raw: newUser, formatted: formatUser(newUser) });
     } catch (error) {
-      console.error("Error creating user:", error);
+      logger.error("Error formatting users", { error });
       res.status(500).json({ error: "Internal server error" });
     }
   });
