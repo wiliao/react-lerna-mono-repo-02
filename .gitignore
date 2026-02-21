@@ -49,3 +49,13 @@ test-results/
 
 # Jest
 coverage/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# But DO commit the example template so others know what vars are needed
+!.env.example

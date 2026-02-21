@@ -77,7 +77,8 @@ export const fetchUsers = () => {
     dispatch({ type: SET_ERROR, payload: null });
 
     try {
-      const response = await fetch("http://localhost:4000/api/users");
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
+      const response = await fetch(`${API_URL}/api/users`);
 
       // ✅ fetch() only rejects on network failure, NOT on 4xx/5xx responses.
       // We must manually check response.ok to catch API-level errors.

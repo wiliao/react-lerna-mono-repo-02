@@ -1,5 +1,5 @@
-// packages/web/webpack.config.js
 const path = require("path");
+const webpack = require("webpack"); // ✅ was missing
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
@@ -9,7 +9,10 @@ module.exports = {
     filename: "bundle.js",
     clean: true,
   },
-  devtool: "source-map",
+
+  // ✅ Fast rebuilds in dev, full separate source maps in prod
+  devtool:
+    process.env.NODE_ENV === "production" ? "source-map" : "eval-source-map",
 
   module: {
     rules: [
@@ -47,6 +50,8 @@ module.exports = {
         __dirname,
         "../../node_modules/react-dom/client",
       ),
+      // ✅ Dev: use TS source directly (no build step needed)
+      // Prod: use compiled JS from dist (tsc must run first)
       "@demo/common":
         process.env.NODE_ENV === "production"
           ? path.resolve(__dirname, "../common/dist")
@@ -57,6 +62,17 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+    // ✅ Replaces process.env.X at build time with the actual string value
+    // Without this, the browser receives the literal text "process.env.X"
+    // and throws "process is not defined"
+    new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify(
+        process.env.NODE_ENV || "development",
+      ),
+      "process.env.REACT_APP_API_URL": JSON.stringify(
+        process.env.REACT_APP_API_URL || "http://localhost:4000",
+      ),
     }),
   ],
 
@@ -75,7 +91,7 @@ module.exports = {
         warnings: false,
       },
     },
-    // ✅ ADD THIS: Suppress URIError from serve-index middleware
+    // ✅ Filters out serve-index middleware to suppress URIError in dev server
     setupMiddlewares: (middlewares, devServer) => {
       if (!devServer) throw new Error("webpack-dev-server is not defined");
 

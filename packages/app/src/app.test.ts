@@ -46,10 +46,17 @@ describe("Express API Endpoints", () => {
       // Assert HTTP 200 OK status (standard for successful GET)
       expect(res.status).toBe(200);
 
-      // Assert response body matches expected contract:
-      // { status: "ok", service: "<APP_NAME>" }
-      // This validates the endpoint structure hasn't accidentally changed.
-      expect(res.body).toEqual({ status: "ok", service: APP_NAME });
+      // ✅ Use toMatchObject instead of toEqual —
+      // toMatchObject checks that the expected fields are present
+      // without failing if extra fields (timestamp, uptime) are added later
+      expect(res.body).toMatchObject({ status: "ok", service: APP_NAME });
+
+      // ✅ Validate the new fields are present and the correct type
+      expect(typeof res.body.uptime).toBe("number");
+      expect(typeof res.body.timestamp).toBe("string");
+      expect(new Date(res.body.timestamp).toISOString()).toBe(
+        res.body.timestamp,
+      );
     });
   });
 

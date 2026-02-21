@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import App from "./App";
 import store from "./store";
+import ErrorBoundary from "./ErrorBoundary";
 
 // ─────────────────────────────────────────────────────────────
 // 🌳 DOM Entry Point
@@ -40,17 +41,20 @@ root.render(
   //   - Deprecated API usage
   // If you see useEffect running twice in dev, this is why — it's intentional.
   <React.StrictMode>
-    {/* ───────────────────────────────────────────────────────
-        🏪 Redux Provider
-        ───────────────────────────────────────────────────────
-        Provider makes the Redux store available to every component
-        in the tree via React Context — without it, useSelector and
-        useDispatch would throw errors because they can't find the store.
-        The store only needs to be passed once here at the root;
-        no need to prop-drill it down to individual components. */}
-    <Provider store={store}>
-      {/* App is the root component — the entire component tree lives here */}
-      <App />
-    </Provider>
+    <ErrorBoundary>
+      {/* ✅ catches render crashes in any child */}
+      {/* ───────────────────────────────────────────────────────
+          🏪 Redux Provider
+          ───────────────────────────────────────────────────────
+          Provider makes the Redux store available to every component
+          in the tree via React Context — without it, useSelector and
+          useDispatch would throw errors because they can't find the store.
+          The store only needs to be passed once here at the root;
+          no need to prop-drill it down to individual components. */}
+      <Provider store={store}>
+        {/* App is the root component — the entire component tree lives here */}
+        <App />
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

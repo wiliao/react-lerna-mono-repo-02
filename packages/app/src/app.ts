@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 import cors from "cors";
 import morgan from "morgan";
+import helmet from "helmet";
 import { logger } from "./logger";
 import { APP_NAME, formatUser, User } from "@demo/common";
 import { config } from "./config";
@@ -33,6 +35,16 @@ export function createApp() {
     }),
   );
 
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per window
+      message: { error: "Too many requests, please try again later" },
+    }),
+  );
+
+  app.use(helmet()); // sets X-Content-Type-Options, HSTS, CSP, and more
+
   // ─────────────────────────────────────────────────────────────
   // 🗄️ Mock Data
   // ─────────────────────────────────────────────────────────────
@@ -45,8 +57,13 @@ export function createApp() {
   // ─────────────────────────────────────────────────────────────
   // 🏥 Health Check: GET /health
   // ─────────────────────────────────────────────────────────────
-  app.get("/health", (_req: Request, res: Response) => {
-    res.status(200).json({ status: "ok", service: APP_NAME });
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      service: APP_NAME,
+      uptime: process.uptime(), // seconds since process started
+      timestamp: new Date().toISOString(),
+    });
   });
 
   // ─────────────────────────────────────────────────────────────
