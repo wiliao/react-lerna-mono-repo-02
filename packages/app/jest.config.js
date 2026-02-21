@@ -21,4 +21,7 @@ module.exports = {
   },
   clearMocks: true,
   verbose: true,
+  testEnvironment: "node",
+  detectOpenHandles: true, // ✅ confirms if open handles are the cause
+  forceExit: true, // ✅ force Jest to exit after all tests complete
 };

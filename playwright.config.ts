@@ -2,7 +2,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./e2e", // ✅ Tests at root/e2e/
+  testDir: "./e2e",
   timeout: 30_000,
   expect: { timeout: 5_000 },
   fullyParallel: true,
@@ -12,7 +12,7 @@ export default defineConfig({
   reporter: "html",
 
   use: {
-    baseURL: "http://localhost:3000", // Your web app URL
+    baseURL: "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -22,20 +22,24 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
-    // Add more browsers as needed
   ],
 
-  // ✅ Auto-start your apps before tests
   webServer: [
     {
-      command: "npm run start:app", // Backend
+      command: "npm run start:app", // Backend API on :4000
       url: "http://localhost:4000/health",
       reuseExistingServer: !process.env.CI,
+      timeout: 60_000, // ✅ Wait up to 60s for server to be ready
+      stdout: "pipe", // ✅ Show server logs in Playwright output
+      stderr: "pipe",
     },
     {
-      command: "npm run start:web", // Frontend
+      command: "npm run start:web", // Frontend on :3000
       url: "http://localhost:3000",
       reuseExistingServer: !process.env.CI,
+      timeout: 120_000, // ✅ Webpack can be slow on first build
+      stdout: "pipe",
+      stderr: "pipe",
     },
   ],
 });

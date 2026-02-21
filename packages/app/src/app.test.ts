@@ -5,20 +5,32 @@
 import request from "supertest"; // HTTP assertion library for Express
 import { createApp } from "./app"; // App factory for test isolation
 import { APP_NAME, formatUser, type User } from "@demo/common"; // Real shared code
+import { Server } from "http";
 
 // ─────────────────────────────────────────────────────────────
 // 🧪 Top-Level Test Suite: All Express API Endpoint Tests
 // ─────────────────────────────────────────────────────────────
 describe("Express API Endpoints", () => {
   // App instance scoped to this describe block
-  // Each test gets a fresh instance via beforeEach() for isolation
   let app: ReturnType<typeof createApp>;
+  // Server instance used to control lifecycle (start/stop) around each test
+  let server: Server;
 
-  // ✅ CRITICAL: Create fresh app instance before EACH test
-  // This ensures tests don't share state (e.g., modified users array)
-  // and can run in any order without affecting each other.
+  // ✅ CRITICAL: Create fresh app instance AND start a real server before EACH test.
+  // - Fresh app ensures tests don't share state (e.g., modified users array)
+  // - port 0 = OS assigns a random available port, preventing port conflicts
+  //   when tests run in parallel or sequentially without cleanup
   beforeEach(() => {
     app = createApp();
+    server = app.listen(0); // ✅ port 0 = random port, avoids conflicts
+  });
+
+  // ✅ CRITICAL: Close the server after EACH test.
+  // Passing `done` to server.close() ensures Jest waits for the server
+  // to fully close before moving on — prevents open handle warnings
+  // and eliminates the flaky test detection by Nx/Lerna.
+  afterEach((done) => {
+    server.close(done); // ✅ cleanly close after every test
   });
 
   // ─────────────────────────────────────────────────────────
@@ -26,8 +38,10 @@ describe("Express API Endpoints", () => {
   // ─────────────────────────────────────────────────────────
   describe("GET /health", () => {
     it("returns 200 with service status", async () => {
-      // Make HTTP GET request to /health endpoint using Supertest
-      const res = await request(app).get("/health");
+      // ✅ Pass `server` (not `app`) to Supertest — gives us full lifecycle control
+      // When passing `app`, Supertest creates its own internal server and may
+      // not clean it up, leading to open handles and flaky test detection.
+      const res = await request(server).get("/health");
 
       // Assert HTTP 200 OK status (standard for successful GET)
       expect(res.status).toBe(200);
@@ -44,7 +58,7 @@ describe("Express API Endpoints", () => {
   // ─────────────────────────────────────────────────────────
   describe("GET /", () => {
     it("returns backend service name", async () => {
-      const res = await request(app).get("/");
+      const res = await request(server).get("/");
 
       expect(res.status).toBe(200);
 
@@ -59,7 +73,7 @@ describe("Express API Endpoints", () => {
   // ─────────────────────────────────────────────────────────
   describe("GET /api/users", () => {
     it("returns array of formatted users", async () => {
-      const res = await request(app).get("/api/users");
+      const res = await request(server).get("/api/users");
 
       // 1️⃣ Validate HTTP response
       expect(res.status).toBe(200);
@@ -89,7 +103,7 @@ describe("Express API Endpoints", () => {
     // ✅ Scenario 1: Valid ID → Return user (Happy Path)
     it("returns user when ID exists", async () => {
       const alice: User = { id: 1, name: "Alice" };
-      const res = await request(app).get("/api/users/1");
+      const res = await request(server).get("/api/users/1");
 
       expect(res.status).toBe(200);
 
@@ -103,7 +117,7 @@ describe("Express API Endpoints", () => {
 
     // ✅ Scenario 2: Valid ID format, but user doesn't exist → 404
     it("returns 404 when user not found", async () => {
-      const res = await request(app).get("/api/users/999");
+      const res = await request(server).get("/api/users/999");
 
       // 404 = Resource Not Found (standard HTTP semantics)
       expect(res.status).toBe(404);
@@ -114,7 +128,7 @@ describe("Express API Endpoints", () => {
 
     // ✅ Scenario 3: Invalid ID format (non-numeric string) → 400
     it("returns 400 for invalid ID (non-numeric)", async () => {
-      const res = await request(app).get("/api/users/abc");
+      const res = await request(server).get("/api/users/abc");
 
       // 400 = Bad Request (client sent invalid data)
       expect(res.status).toBe(400);
@@ -126,7 +140,7 @@ describe("Express API Endpoints", () => {
     // Our app uses regex validation: !/^\d+$/.test(userIdParam)
     it("returns 400 for float ID", async () => {
       // ✅ This test validates our ID validation logic rejects floats
-      const res = await request(app).get("/api/users/1.5");
+      const res = await request(server).get("/api/users/1.5");
       expect(res.status).toBe(400);
       expect(res.body).toEqual({ error: "Invalid user ID" });
     });
@@ -138,7 +152,7 @@ describe("Express API Endpoints", () => {
   describe("404 Handler", () => {
     it("returns 404 for unknown routes", async () => {
       // Request a route that doesn't exist in our Express app
-      const res = await request(app).get("/nonexistent");
+      const res = await request(server).get("/nonexistent");
 
       // Should trigger the catch-all middleware: app.use((req, res) => {...})
       expect(res.status).toBe(404);
