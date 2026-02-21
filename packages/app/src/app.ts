@@ -1,27 +1,63 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { APP_NAME, formatUser, User } from "@demo/common";
+import { config } from "./config";
 
 export function createApp() {
   const app = express();
 
-  app.use(cors());
+  // ─────────────────────────────────────────────────────────────
+  // ⚙️ Middleware
+  // ─────────────────────────────────────────────────────────────
+
+  // ✅ Explicit CORS config: only allow requests from our known frontend origin
+  // In dev this is localhost:3000; in prod set ALLOWED_ORIGIN env var
+  app.use(
+    cors({
+      origin: config.allowedOrigin,
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
+
   app.use(express.json());
 
-  // Mock data (could be injected for advanced testing)
+  // ✅ Request logger - teaches how middleware works:
+  // every request passes through here before hitting any route handler
+  // In production you'd replace this with a library like `morgan`
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    if (config.isDev) {
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    }
+    next(); // ✅ always call next() or the request hangs forever
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // 🗄️ Mock Data
+  // ─────────────────────────────────────────────────────────────
+  // Could be injected via createApp(users) for more advanced testing
   const users: User[] = [
     { id: 1, name: "Alice" },
     { id: 2, name: "Bob" },
   ];
 
+  // ─────────────────────────────────────────────────────────────
+  // 🏥 Health Check: GET /health
+  // ─────────────────────────────────────────────────────────────
   app.get("/health", (_req: Request, res: Response) => {
     res.status(200).json({ status: "ok", service: APP_NAME });
   });
 
+  // ─────────────────────────────────────────────────────────────
+  // 🏠 Root: GET /
+  // ─────────────────────────────────────────────────────────────
   app.get("/", (_req: Request, res: Response) => {
     res.send(`Backend Service: ${APP_NAME}`);
   });
 
+  // ─────────────────────────────────────────────────────────────
+  // 👥 List Users: GET /api/users
+  // ─────────────────────────────────────────────────────────────
   app.get("/api/users", (_req: Request, res: Response) => {
     try {
       const formattedUsers = users.map((u) => ({
@@ -35,9 +71,12 @@ export function createApp() {
     }
   });
 
+  // ─────────────────────────────────────────────────────────────
+  // 👤 Get User by ID: GET /api/users/:id
+  // ─────────────────────────────────────────────────────────────
   app.get("/api/users/:id", (req: Request, res: Response): void => {
     try {
-      // ✅ FIX: Extract single string value (handle string | string[] type)
+      // ✅ Handle string | string[] type from Express params
       const userIdParam = Array.isArray(req.params.id)
         ? req.params.id[0]
         : req.params.id;
@@ -45,6 +84,7 @@ export function createApp() {
       const userId = parseInt(userIdParam, 10);
 
       // Reject if: NaN, float, negative, or non-numeric string
+      // e.g. "abc", "1.5", "-1" all fail this check
       if (isNaN(userId) || !/^\d+$/.test(userIdParam)) {
         res.status(400).json({ error: "Invalid user ID" });
         return;
@@ -57,22 +97,59 @@ export function createApp() {
         return;
       }
 
-      res.json({
-        raw: user,
-        formatted: formatUser(user),
-      });
+      res.json({ raw: user, formatted: formatUser(user) });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
 
-  // 404 handler
+  // ─────────────────────────────────────────────────────────────
+  // ➕ Create User: POST /api/users
+  // ─────────────────────────────────────────────────────────────
+  app.post("/api/users", (req: Request, res: Response): void => {
+    try {
+      const { id, name } = req.body;
+
+      // ✅ Validate required fields before touching data
+      if (typeof id !== "number" || typeof name !== "string" || !name.trim()) {
+        res
+          .status(400)
+          .json({ error: "id (number) and name (string) are required" });
+        return;
+      }
+
+      // 409 Conflict = resource already exists (more accurate than 400)
+      const exists = users.find((u) => u.id === id);
+      if (exists) {
+        res.status(409).json({ error: "User already exists" });
+        return;
+      }
+
+      const newUser: User = { id, name: name.trim() };
+      users.push(newUser);
+
+      // 201 Created = new resource was successfully created (not 200)
+      res.status(201).json({ raw: newUser, formatted: formatUser(newUser) });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // 🚫 404 Handler: catch-all for undefined routes
+  // Must be registered AFTER all valid routes
+  // ─────────────────────────────────────────────────────────────
   app.use((_req: Request, res: Response) => {
     res.status(404).json({ error: "Route not found" });
   });
 
-  // Global error handler
+  // ─────────────────────────────────────────────────────────────
+  // 💥 Global Error Handler
+  // 4 arguments are REQUIRED - Express identifies this as an error
+  // handler specifically because of the (err, req, res, next) signature
+  // ─────────────────────────────────────────────────────────────
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error("Unhandled error:", err);
     res.status(500).json({ error: "Internal server error" });
