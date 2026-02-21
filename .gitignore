@@ -4,14 +4,40 @@
 # Build outputs
 **/dist/
 
-# Node modules
-node_modules/
-packages/app/tsconfig.tsbuildinfo
+# Node modules (except at root for hoisting if needed)
+**/node_modules/
+
+# Generated Jest config files
 packages/web/jest.config.d.ts
 packages/web/jest.config.d.ts.map
 packages/web/jest.config.js
 packages/web/jest.config.js.map
 
-# qodo
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Qodo
 .qodo/
-package-lock.json
+
+# ✅ KEEP package-lock.json tracked (remove from ignore list)
+# package-lock.json  ← Delete or comment this line
