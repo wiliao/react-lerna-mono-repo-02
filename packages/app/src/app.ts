@@ -37,10 +37,14 @@ export function createApp() {
 
   app.get("/api/users/:id", (req: Request, res: Response): void => {
     try {
-      const userIdParam = req.params.id;
+      // ✅ FIX: Extract single string value (handle string | string[] type)
+      const userIdParam = Array.isArray(req.params.id)
+        ? req.params.id[0]
+        : req.params.id;
+
       const userId = parseInt(userIdParam, 10);
 
-      // ✅ Proper validation: reject non-integers, floats, NaN, negatives
+      // Reject if: NaN, float, negative, or non-numeric string
       if (isNaN(userId) || !/^\d+$/.test(userIdParam)) {
         res.status(400).json({ error: "Invalid user ID" });
         return;

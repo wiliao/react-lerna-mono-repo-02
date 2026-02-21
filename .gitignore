@@ -14,3 +14,4 @@ packages/web/jest.config.js.map
 
 # qodo
 .qodo/
+package-lock.json

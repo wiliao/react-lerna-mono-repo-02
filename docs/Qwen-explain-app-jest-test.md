@@ -58,10 +58,10 @@ import { APP_NAME, formatUser, type User } from "@demo/common";
 npm run test:app
 
 # Watch mode for TDD
-npm run test:app -- -- --watch
+npm run test:app --watch
 
 # With coverage report
-npm run test:app -- -- --coverage
+npm run test:app --coverage
 
 # Run all package tests (skips @demo/common)
 npm test
