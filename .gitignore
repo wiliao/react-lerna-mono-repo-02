@@ -40,4 +40,4 @@ coverage/
 .qodo/
 
 # ✅ KEEP package-lock.json tracked (remove from ignore list)
-# package-lock.json  ← Delete or comment this line
+package-lock.json  ← Delete or comment this line
