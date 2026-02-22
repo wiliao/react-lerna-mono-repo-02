@@ -7,6 +7,8 @@ import { logger } from "./logger";
 import { APP_NAME, formatUser } from "@demo/common";
 import { config } from "./config";
 import { UserModel } from "./db";
+import authRouter from "./routes/auth";
+import { requireAuth } from "./middleware/auth";
 
 export function createApp() {
   const app = express();
@@ -51,6 +53,10 @@ export function createApp() {
       message: { error: "Too many requests, please try again later" },
     }),
   );
+
+  // After middleware, before API routes:
+  app.use("/auth", authRouter); // ✅ public — no auth needed
+  app.use(requireAuth); // ✅ everything below requires a valid JWT
 
   // ─────────────────────────────────────────────────────────────
   // 🏥 Health Check: GET /health

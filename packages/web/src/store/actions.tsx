@@ -10,7 +10,9 @@ import { User } from "@demo/common";
 // but hardcoded in a switch case it would silently fail.
 export const FETCH_USERS_SUCCESS = "FETCH_USERS_SUCCESS";
 export const SET_LOADING = "SET_LOADING";
-export const SET_ERROR = "SET_ERROR"; // ✅ NEW: surface API errors to the UI
+export const SET_ERROR = "SET_ERROR";
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOGOUT = "LOGOUT";
 
 // ─────────────────────────────────────────────────────────────
 // 📐 Data Shape
@@ -40,10 +42,19 @@ interface SetLoadingAction {
   payload: boolean; // true = request in flight, false = done
 }
 
-// ✅ NEW: carries an error message string (or null to clear the error)
+// carries an error message string (or null to clear the error)
 interface SetErrorAction {
   type: typeof SET_ERROR;
   payload: string | null;
+}
+
+interface LoginSuccessAction {
+  type: typeof LOGIN_SUCCESS;
+  payload: { token: string; username: string };
+}
+
+interface LogoutAction {
+  type: typeof LOGOUT;
 }
 
 // ✅ Union type: UserAction is any one of the above.
@@ -51,54 +62,103 @@ interface SetErrorAction {
 export type UserAction =
   | FetchUsersSuccessAction
   | SetLoadingAction
-  | SetErrorAction;
+  | SetErrorAction
+  | LoginSuccessAction
+  | LogoutAction;
 
 // ─────────────────────────────────────────────────────────────
-// ⚡ Thunk Action Creator: fetchUsers
+// 🌐 API Base URL
 // ─────────────────────────────────────────────────────────────
-// A regular action creator returns a plain object: { type, payload }
-// A THUNK action creator returns a FUNCTION instead.
-// Redux Thunk middleware intercepts that function and calls it with
-// `dispatch`, allowing us to run async logic (API calls) before
-// dispatching the real action.
+// ✅ Defined at module level so ALL thunks can access it.
+// Replaced at build time by webpack DefinePlugin — never reaches the browser
+// as a raw process.env reference.
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
+
+// ─────────────────────────────────────────────────────────────
+// 🔑 Thunk: login
+// ─────────────────────────────────────────────────────────────
+// Sends credentials to POST /auth/login.
+// On success, dispatches LOGIN_SUCCESS with the JWT token.
+// The token is stored in Redux state and sent with every subsequent request.
 //
 // Flow:
-//   1. dispatch(fetchUsers())         ← component triggers the thunk
-//   2. SET_LOADING true               ← spinner starts
-//   3. SET_ERROR null                 ← clear any previous error
-//   4. await fetch(...)               ← API call
-//   5a. FETCH_USERS_SUCCESS + data    ← success: state updated with users
-//   5b. SET_ERROR "message"           ← failure: error surfaced to the UI
-//   6. SET_LOADING false              ← spinner stops (always, via finally)
-export const fetchUsers = () => {
+//   1. dispatch(login(username, password))  ← LoginPage triggers this
+//   2. SET_LOADING true                     ← button shows "Signing in..."
+//   3. SET_ERROR null                       ← clear previous errors
+//   4. POST /auth/login                     ← API call
+//   5a. LOGIN_SUCCESS + token               ← success: App renders
+//   5b. SET_ERROR "message"                 ← failure: error shown on form
+//   6. SET_LOADING false                    ← button re-enabled
+export const login = (username: string, password: string) => {
   return async (dispatch: Dispatch<UserAction>) => {
-    // ✅ Tell the UI a request is in flight and clear any previous error
+    // ✅ typed consistently
+    dispatch({ type: SET_LOADING, payload: true });
+    dispatch({ type: SET_ERROR, payload: null });
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) throw new Error("Invalid username or password");
+
+      const { token, username: name } = await response.json();
+
+      // ✅ Store token in Redux state (in-memory only)
+      // Lost on page refresh — for persistence use sessionStorage
+      // and rehydrate on app startup. Never use localStorage for tokens.
+      dispatch({ type: LOGIN_SUCCESS, payload: { token, username: name } });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Login failed";
+      dispatch({ type: SET_ERROR, payload: message });
+    } finally {
+      dispatch({ type: SET_LOADING, payload: false });
+    }
+  };
+};
+
+// ─────────────────────────────────────────────────────────────
+// ⚡ Thunk: fetchUsers
+// ─────────────────────────────────────────────────────────────
+// Fetches all users from GET /api/users, authenticated with JWT.
+// Token comes from Redux state (state.users.token) via App.tsx.
+//
+// Flow:
+//   1. dispatch(fetchUsers(token))        ← App.tsx triggers on mount
+//   2. SET_LOADING true                   ← spinner starts
+//   3. SET_ERROR null                     ← clear any previous error
+//   4. GET /api/users + Bearer token      ← authenticated API call
+//   5a. FETCH_USERS_SUCCESS + data        ← success: users render
+//   5b. SET_ERROR "message"               ← failure: error shown in UI
+//   6. SET_LOADING false                  ← spinner stops (always via finally)
+export const fetchUsers = (token: string) => {
+  return async (dispatch: Dispatch<UserAction>) => {
     dispatch({ type: SET_LOADING, payload: true });
     dispatch({ type: SET_ERROR, payload: null });
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
-      const response = await fetch(`${API_URL}/api/users`);
+      const response = await fetch(`${API_URL}/api/users`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ JWT sent with every request
+        },
+      });
 
-      // ✅ fetch() only rejects on network failure, NOT on 4xx/5xx responses.
-      // We must manually check response.ok to catch API-level errors.
+      // ✅ fetch() only rejects on network failure, NOT on 4xx/5xx.
+      // Must manually check response.ok to catch API-level errors.
       if (!response.ok) {
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
 
       const data: FormattedUser[] = await response.json();
-
-      // ✅ Success: hand the data to the reducer to update state
       dispatch({ type: FETCH_USERS_SUCCESS, payload: data });
     } catch (error) {
-      // ✅ Dispatch the error message to state so the UI can render it
-      // instead of silently showing an empty list
       const message =
         error instanceof Error ? error.message : "Unknown error occurred";
       dispatch({ type: SET_ERROR, payload: message });
     } finally {
-      // ✅ finally guarantees loading is cleared whether the call
-      // succeeded or failed — prevents a stuck spinner
+      // ✅ finally guarantees loading clears whether call succeeded or failed
       dispatch({ type: SET_LOADING, payload: false });
     }
   };

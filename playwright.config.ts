@@ -11,6 +11,10 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
 
+  // ✅ Run global setup before any tests — seeds the database
+  // so E2E tests always run against a known dataset
+  globalSetup: "./e2e/global-setup.ts",
+
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",

@@ -6,9 +6,9 @@ import { Server } from "http";
 // ─────────────────────────────────────────────────────────────
 // 🧪 Mock UserModel — prevents real MongoDB calls in tests
 // ─────────────────────────────────────────────────────────────
-// Routes now use Mongoose which requires a live DB connection.
-// We mock UserModel at the module level so tests stay fast,
-// deterministic, and runnable without Docker.
+// Routes use Mongoose which requires a live DB connection.
+// We mock UserModel so tests stay fast, deterministic,
+// and runnable without Docker.
 jest.mock("./db", () => ({
   UserModel: {
     find: jest.fn(),
@@ -17,14 +17,30 @@ jest.mock("./db", () => ({
   },
 }));
 
-// Import AFTER jest.mock() so we get the mocked version
+// ─────────────────────────────────────────────────────────────
+// 🧪 Mock requireAuth — bypasses JWT verification in tests
+// ─────────────────────────────────────────────────────────────
+// requireAuth blocks all protected routes with 401 unless a valid
+// JWT is provided. In tests we only want to test route logic,
+// not the auth layer — that is covered separately in auth.test.ts.
+// We replace it with a pass-through that attaches a fake user
+// to req and always calls next().
+jest.mock("./middleware/auth", () => ({
+  requireAuth: (req: any, _res: any, next: any) => {
+    req.user = { userId: "test-user-id", username: "testuser" };
+    next(); // ✅ always passes — no token check in tests
+  },
+}));
+
+// ✅ Import AFTER jest.mock() so we get the mocked versions
 import { UserModel } from "./db";
 
 // ─────────────────────────────────────────────────────────────
 // 🧪 Top-Level Test Suite: All Express API Endpoint Tests
 // ─────────────────────────────────────────────────────────────
-// This is an INTEGRATION test: we test the real Express app with
-// real middleware, but with the database layer mocked out.
+// Integration test: real Express app + real middleware,
+// but with DB and auth layers mocked out.
+// Auth middleware behaviour is tested separately in auth.test.ts.
 describe("Express API Endpoints", () => {
   let app: ReturnType<typeof createApp>;
   let server: Server;
@@ -41,22 +57,21 @@ describe("Express API Endpoints", () => {
   });
 
   // ✅ Close server AND clear all mocks after each test
-  // Prevents mock call counts leaking between tests
+  // Prevents mock state leaking between tests
   afterEach((done) => {
     jest.clearAllMocks();
     server.close(done);
   });
 
   // ─────────────────────────────────────────────────────────
-  // 🏥 Health Check: GET /health
+  // 🏥 Health Check: GET /health  (public — no auth needed)
   // ─────────────────────────────────────────────────────────
   describe("GET /health", () => {
     it("returns 200 with service status", async () => {
       const res = await request(server).get("/health");
 
       expect(res.status).toBe(200);
-
-      // ✅ toMatchObject: passes even if uptime/timestamp are added
+      // toMatchObject: passes even if uptime/timestamp fields are present
       expect(res.body).toMatchObject({ status: "ok", service: APP_NAME });
       expect(typeof res.body.uptime).toBe("number");
       expect(typeof res.body.timestamp).toBe("string");
@@ -64,7 +79,7 @@ describe("Express API Endpoints", () => {
   });
 
   // ─────────────────────────────────────────────────────────
-  // 🏠 Root: GET /
+  // 🏠 Root: GET /  (public — no auth needed)
   // ─────────────────────────────────────────────────────────
   describe("GET /", () => {
     it("returns backend service name", async () => {
@@ -76,11 +91,10 @@ describe("Express API Endpoints", () => {
   });
 
   // ─────────────────────────────────────────────────────────
-  // 👥 GET /api/users
+  // 👥 GET /api/users  (protected — auth mocked)
   // ─────────────────────────────────────────────────────────
   describe("GET /api/users", () => {
     it("returns array of formatted users", async () => {
-      // ✅ Tell the mock what UserModel.find() should return
       (UserModel.find as jest.Mock).mockResolvedValue([mockAlice, mockBob]);
 
       const res = await request(server).get("/api/users");
@@ -97,7 +111,6 @@ describe("Express API Endpoints", () => {
     });
 
     it("returns 500 when database throws", async () => {
-      // ✅ Simulate a database failure
       (UserModel.find as jest.Mock).mockRejectedValue(new Error("DB error"));
 
       const res = await request(server).get("/api/users");
@@ -108,7 +121,7 @@ describe("Express API Endpoints", () => {
   });
 
   // ─────────────────────────────────────────────────────────
-  // 👤 GET /api/users/:id
+  // 👤 GET /api/users/:id  (protected — auth mocked)
   // ─────────────────────────────────────────────────────────
   describe("GET /api/users/:id", () => {
     // ✅ Scenario 1: Valid ID → Return user (Happy Path)
@@ -127,7 +140,7 @@ describe("Express API Endpoints", () => {
 
     // ✅ Scenario 2: Valid ID format but user doesn't exist → 404
     it("returns 404 when user not found", async () => {
-      // ✅ null = Mongoose findOne found nothing
+      // null = Mongoose findOne found nothing
       (UserModel.findOne as jest.Mock).mockResolvedValue(null);
 
       const res = await request(server).get("/api/users/999");
@@ -145,6 +158,8 @@ describe("Express API Endpoints", () => {
     });
 
     // ✅ Scenario 4: Float ID → 400 (edge case)
+    // parseInt("1.5") === 1 which could cause bugs —
+    // our regex validation !/^\d+$/ correctly rejects floats
     it("returns 400 for float ID", async () => {
       const res = await request(server).get("/api/users/1.5");
 
@@ -154,7 +169,7 @@ describe("Express API Endpoints", () => {
   });
 
   // ─────────────────────────────────────────────────────────
-  // ➕ POST /api/users
+  // ➕ POST /api/users  (protected — auth mocked)
   // ─────────────────────────────────────────────────────────
   describe("POST /api/users", () => {
     it("creates a new user", async () => {
@@ -199,7 +214,7 @@ describe("Express API Endpoints", () => {
   });
 
   // ─────────────────────────────────────────────────────────
-  // 🚫 404 Handler
+  // 🚫 404 Handler  (protected — auth mocked)
   // ─────────────────────────────────────────────────────────
   describe("404 Handler", () => {
     it("returns 404 for unknown routes", async () => {

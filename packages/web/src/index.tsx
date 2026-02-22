@@ -44,13 +44,13 @@ root.render(
     <ErrorBoundary>
       {/* ✅ catches render crashes in any child */}
       {/* ───────────────────────────────────────────────────────
-          🏪 Redux Provider
-          ───────────────────────────────────────────────────────
-          Provider makes the Redux store available to every component
-          in the tree via React Context — without it, useSelector and
-          useDispatch would throw errors because they can't find the store.
-          The store only needs to be passed once here at the root;
-          no need to prop-drill it down to individual components. */}
+            🏪 Redux Provider
+            ───────────────────────────────────────────────────────
+            Provider makes the Redux store available to every component
+            in the tree via React Context — without it, useSelector and
+            useDispatch would throw errors because they can't find the store.
+            The store only needs to be passed once here at the root;
+            no need to prop-drill it down to individual components. */}
       <Provider store={store}>
         {/* App is the root component — the entire component tree lives here */}
         <App />

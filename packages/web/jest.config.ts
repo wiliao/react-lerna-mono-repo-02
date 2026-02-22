@@ -1,12 +1,12 @@
 // packages/web/jest.config.ts
-import type { JestConfigWithTsJest } from "ts-jest";
+import type { Config } from "jest"; // ✅ use base Config type — includes setupFilesAfterEnv
 
-const config: JestConfigWithTsJest = {
+const config: Config = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
 
-  // ✅ FIXED: Correct property name
-  //setupFilesAfterEnv: ["./jest.setup.ts"],
+  // ✅ Uncommented — loads jest-dom matchers before every test
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 
   roots: ["<rootDir>/src"],
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
@@ -21,7 +21,6 @@ const config: JestConfigWithTsJest = {
     ],
   },
 
-  // ✅ FIXED: Point to BUILT common, not source
   moduleNameMapper: {
     "^@demo/common$": "<rootDir>/../common/dist/index.js",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",

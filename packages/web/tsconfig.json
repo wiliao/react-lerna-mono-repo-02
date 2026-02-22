@@ -12,7 +12,7 @@
     // ✅ Add baseUrl + paths to resolve @demo/common to dist
     "baseUrl": ".",
     "paths": {
-      "@demo/common": ["../common/dist/index.d.ts"]
+      "@demo/common": ["../common/dist"]
     }
   },
   "include": ["src/**/*"],
