@@ -16,22 +16,29 @@
 
 ## 📖 Table of Contents
 
-- [🎯 Overview](#overview)
-- [🏗️ Architecture](#architecture)
-- [🚀 Quick Start](#quick-start)
-- [📦 Packages](#packages)
-- [🧪 Testing](#testing)
-- [🛠️ Development Commands](#development-commands)
-- [🔐 Authentication Flow](#authentication-flow)
-- [🎨 Design System](#design-system)
-- [🐳 Docker Support](#docker-support)
-- [🔧 Environment Variables](#environment-variables)
-- [📊 Project Status](#project-status)
-- [🤝 Contributing](#contributing)
-- [🛠️ Troubleshooting](#troubleshooting)
-- [📄 License](#license)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Packages](#packages)
+- [Testing](#testing)
+- [Development Commands](#development-commands)
+- [Authentication Flow](#authentication-flow)
+- [Design System](#design-system)
+- [Docker Support](#docker-support)
+- [Environment Variables](#environment-variables)
+- [Project Status](#project-status)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+<!-- markdownlint-enable MD051 -->
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="overview"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🎯 Overview
 
@@ -48,6 +55,12 @@ A full‑stack monorepo demonstrating enterprise‑grade architecture with type�
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="architecture"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 🏗️ Architecture
 
 ```bash
@@ -62,6 +75,8 @@ react-lerna-mono-repo-02/
 └── playwright.config.ts
 ```
 
+````
+
 ### Package Dependencies
 
 ```mermaid
@@ -74,6 +89,12 @@ graph LR
 All packages share TypeScript configuration via project references, ensuring type safety across the monorepo.
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="quick-start"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🚀 Quick Start
 
@@ -113,6 +134,12 @@ npm run dev
 > 🔐 HTTPS uses self‑signed certificates. Click "Advanced → Proceed" on first load, or install the certificate locally for a trusted experience.
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="packages"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 📦 Packages
 
@@ -182,6 +209,12 @@ packages/web/src/
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="testing"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 🧪 Testing
 
 ### Unit Tests (Jest)
@@ -239,6 +272,12 @@ npm run typecheck -- --build --force
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="development-commands"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 🛠️ Development Commands
 
 | Command                  | Description                         |
@@ -257,6 +296,12 @@ npm run typecheck -- --build --force
 > **Note**: These scripts assume they are defined in the root `package.json`. Adjust according to your actual setup.
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="authentication-flow"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🔐 Authentication Flow
 
@@ -279,6 +324,12 @@ sequenceDiagram
 ```
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="design-system"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🎨 Design System
 
@@ -304,6 +355,12 @@ sequenceDiagram
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="docker-support"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 🐳 Docker Support
 
 ### Quick Start with Docker
@@ -328,6 +385,12 @@ docker-compose down
 > If you wish to containerize the backend and frontend as well, extend the `docker-compose.yml` accordingly.
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="environment-variables"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🔧 Environment Variables
 
@@ -358,6 +421,12 @@ For HTTPS local development, place your certificates in `ssl/` and reference the
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="project-status"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 📊 Project Status
 
 | Feature                       | Status      | Details                            |
@@ -376,6 +445,12 @@ For HTTPS local development, place your certificates in `ssl/` and reference the
 | Role‑Based Access             | 🟡 Planned  | Admin/user permissions             |
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="contributing"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 🤝 Contributing
 
@@ -414,6 +489,12 @@ refactor: extract Header component from App
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+
+<a id="troubleshooting"></a>
+
+<!-- markdownlint-enable MD033 -->
+
 ## 🛠️ Troubleshooting
 
 | Issue                             | Solution                                                  |
@@ -442,6 +523,12 @@ npm run build -- --stats
 ```
 
 ---
+
+<!-- markdownlint-disable MD033 -->
+
+<a id="license"></a>
+
+<!-- markdownlint-enable MD033 -->
 
 ## 📄 License
 
@@ -472,47 +559,4 @@ See [LICENSE](LICENSE) for full terms.
 **Last Updated**: February 22, 2026
 **Version**: 2.1.0
 **Status**: ✅ Production‑Ready
-
----
-
-## ✅ What Changed
-
-| Before                        | After                                        | Why                                                         |
-| ----------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| `## Overview` (plain heading) | `- [🎯 Overview](#overview)` (bulleted link) | Creates clickable TOC entries                               |
-| No anchor links               | Proper GitHub-compatible anchors             | Emojis stripped in auto-IDs: `## 🎯 Overview` → `#overview` |
-| Broken TOC                    | Working navigation                           | Click any item → scrolls to section                         |
-
----
-
-## 🧪 Verify It Works
-
-1. **Push to GitHub**
-2. **Open README on GitHub.com** (not VS Code preview)
-3. **Click each TOC link** — should scroll smoothly to the section
-4. **Check URL bar** — should update with anchor (e.g., `#authentication-flow`)
-
----
-
-## 🔗 Anchor Reference Table
-
-| Heading                       | Auto-Generated ID        |
-| ----------------------------- | ------------------------ |
-| `## 🎯 Overview`              | `#overview`              |
-| `## 🏗️ Architecture`          | `#architecture`          |
-| `## 🚀 Quick Start`           | `#quick-start`           |
-| `## 📦 Packages`              | `#packages`              |
-| `## 🧪 Testing`               | `#testing`               |
-| `## 🛠️ Development Commands`  | `#development-commands`  |
-| `## 🔐 Authentication Flow`   | `#authentication-flow`   |
-| `## 🎨 Design System`         | `#design-system`         |
-| `## 🐳 Docker Support`        | `#docker-support`        |
-| `## 🔧 Environment Variables` | `#environment-variables` |
-| `## 📊 Project Status`        | `#project-status`        |
-| `## 🤝 Contributing`          | `#contributing`          |
-| `## 🛠️ Troubleshooting`       | `#troubleshooting`       |
-| `## 📄 License`               | `#license`               |
-
-> 💡 **Rule**: GitHub strips emojis, lowercases, and replaces spaces with hyphens.
-
----
+````
