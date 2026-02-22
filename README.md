@@ -12,9 +12,30 @@
 
 ---
 
+<!-- markdownlint-disable MD051 -->
+
+## 📖 Table of Contents
+
+- [🎯 Overview](#overview)
+- [🏗️ Architecture](#architecture)
+- [🚀 Quick Start](#quick-start)
+- [📦 Packages](#packages)
+- [🧪 Testing](#testing)
+- [🛠️ Development Commands](#development-commands)
+- [🔐 Authentication Flow](#authentication-flow)
+- [🎨 Design System](#design-system)
+- [🐳 Docker Support](#docker-support)
+- [🔧 Environment Variables](#environment-variables)
+- [📊 Project Status](#project-status)
+- [🤝 Contributing](#contributing)
+- [🛠️ Troubleshooting](#troubleshooting)
+- [📄 License](#license)
+
+---
+
 ## 🎯 Overview
 
-A full-stack monorepo demonstrating enterprise-grade architecture with type-safe cross-package imports, comprehensive testing, and polished UI/UX. Built for scalability, maintainability, and developer experience.
+A full‑stack monorepo demonstrating enterprise‑grade architecture with type‑safe cross‑package imports, comprehensive testing, and polished UI/UX. Built for scalability, maintainability, and developer experience.
 
 ### ✨ Key Highlights
 
@@ -23,25 +44,23 @@ A full-stack monorepo demonstrating enterprise-grade architecture with type-safe
 - ⚡ **Performance Optimized** with React.memo and useMemo
 - 🧪 **Full Test Coverage** (Jest + Playwright)
 - 🔒 **HTTPS Ready** for local development
-- 📦 **Type-Safe Monorepo** with TypeScript project references
+- 📦 **Type‑Safe Monorepo** with TypeScript project references
 
 ---
 
 ## 🏗️ Architecture
 
-`````bash
-
+```bash
 react-lerna-mono-repo-02/
 ├── packages/
-│ ├── app/ # Backend: Express + MongoDB + JWT
-│ ├── web/ # Frontend: React 19 + Redux 5
-│ └── common/ # Shared: Types, constants, utilities
-├── e2e/ # Playwright end-to-end tests
-├── .husky/ # Git hooks (pre-commit linting)
-├── docker-compose.yml # Container orchestration
+│   ├── app/           # Backend: Express + MongoDB + JWT
+│   ├── web/           # Frontend: React 19 + Redux 5
+│   └── common/        # Shared: types, constants, utilities
+├── e2e/               # Playwright end‑to‑end tests
+├── .husky/            # Git hooks (pre‑commit linting)
+├── docker-compose.yml # Container orchestration (MongoDB)
 └── playwright.config.ts
-
-````bash
+```
 
 ### Package Dependencies
 
@@ -49,8 +68,10 @@ react-lerna-mono-repo-02/
 graph LR
     web --> common
     app --> common
-    common -->|no deps| null
-`````
+    common --> no-deps[ ]
+```
+
+All packages share TypeScript configuration via project references, ensuring type safety across the monorepo.
 
 ---
 
@@ -74,22 +95,22 @@ cd react-lerna-mono-repo-02
 # Install all dependencies
 npm install
 
-# Generate self-signed certificates (for HTTPS)
+# (Optional) Generate self‑signed certificates for HTTPS
 npm run generate-certs
 
-# Start development servers
+# Start development servers (HTTP)
 npm run dev
 ```
 
 ### Access Points
 
-| Service     | URL                               |
-| ----------- | --------------------------------- |
-| Frontend    | `<https://localhost:3000>`        |
-| Backend API | `<https://localhost:4000>`        |
-| API Health  | `<https://localhost:4000/health>` |
+| Service     | URL                             |
+| ----------- | ------------------------------- |
+| Frontend    | <https://localhost:3000>        |
+| Backend API | <https://localhost:4000>        |
+| API Health  | <https://localhost:4000/health> |
 
-> 🔐 HTTPS uses self-signed certificates. Click "Advanced → Proceed" on first load, or install the cert for a trusted experience.
+> 🔐 HTTPS uses self‑signed certificates. Click "Advanced → Proceed" on first load, or install the certificate locally for a trusted experience.
 
 ---
 
@@ -109,11 +130,11 @@ npm run dev
 
 ```bash
 packages/app/src/
-├── index.ts          # Server entry + HTTPS toggle
-├── app.ts            # Express app + middleware
-├── db.ts             # MongoDB connection
+├── index.ts           # Server entry + HTTPS toggle
+├── app.ts             # Express app + middleware
+├── db.ts              # MongoDB connection
 ├── middleware/auth.ts # JWT validation
-└── routes/auth.ts    # /auth/login, /health
+└── routes/auth.ts     # /auth/login, /health
 ```
 
 ---
@@ -142,7 +163,7 @@ packages/web/src/
 
 **Optimizations**:
 
-- ✅ `React.memo` on `UserCard` prevents unnecessary re-renders
+- ✅ `React.memo` on `UserCard` prevents unnecessary re‑renders
 - ✅ `useMemo` caches expensive `JSON.stringify` operations
 - ✅ Style constants reduce inline style overhead
 - ✅ Semantic HTML with ARIA labels for accessibility
@@ -157,7 +178,7 @@ packages/web/src/
 | `APP_NAME`     | string    | Application name constant   |
 | `formatUser()` | function  | User display formatter      |
 
-**Purpose**: Type-safe cross-package imports via TypeScript project references.
+**Purpose**: Type‑safe cross‑package imports via TypeScript project references.
 
 ---
 
@@ -220,18 +241,20 @@ npm run typecheck -- --build --force
 
 ## 🛠️ Development Commands
 
-| Command                  | Description                   |
-| ------------------------ | ----------------------------- |
-| `npm run dev`            | Start all packages (HTTP)     |
-| `npm run dev:https`      | Start all packages (HTTPS)    |
-| `npm run start:app`      | Start backend only            |
-| `npm run start:web`      | Start frontend only           |
-| `npm run build`          | Production build all packages |
-| `npm run rebuild`        | Clean + rebuild all           |
-| `npm run test`           | Run all unit tests            |
-| `npm run typecheck`      | Validate TypeScript types     |
-| `npm run generate-certs` | Create self-signed SSL certs  |
-| `npm run clean`          | Remove all build artifacts    |
+| Command                  | Description                         |
+| ------------------------ | ----------------------------------- |
+| `npm run dev`            | Start all packages (HTTP)           |
+| `npm run dev:https`      | Start all packages (HTTPS)          |
+| `npm run start:app`      | Start backend only                  |
+| `npm run start:web`      | Start frontend only                 |
+| `npm run build`          | Production build all packages       |
+| `npm run rebuild`        | Clean + rebuild all                 |
+| `npm run test`           | Run all unit tests                  |
+| `npm run typecheck`      | Validate TypeScript types           |
+| `npm run generate-certs` | Create self‑signed SSL certificates |
+| `npm run clean`          | Remove all build artifacts          |
+
+> **Note**: These scripts assume they are defined in the root `package.json`. Adjust according to your actual setup.
 
 ---
 
@@ -286,13 +309,13 @@ sequenceDiagram
 ### Quick Start with Docker
 
 ```bash
-# Start all services (MongoDB + Backend + Frontend)
+# Start MongoDB only (default configuration)
 docker-compose up -d
 
 # View logs
 docker-compose logs -f
 
-# Stop all services
+# Stop MongoDB
 docker-compose down
 ```
 
@@ -301,10 +324,37 @@ docker-compose down
 | Service   | Port  | Description |
 | --------- | ----- | ----------- |
 | `mongodb` | 27017 | Database    |
-| `app`     | 4000  | Backend API |
-| `web`     | 3000  | Frontend    |
 
-See [`docker-compose.yml`](docker-compose.yml) for configuration.
+> If you wish to containerize the backend and frontend as well, extend the `docker-compose.yml` accordingly.
+
+---
+
+## 🔧 Environment Variables
+
+Each package may require its own `.env` file. Copy the examples and adjust values:
+
+```bash
+# Root (if any)
+cp .env.example .env
+
+# Backend
+cp packages/app/.env.example packages/app/.env
+
+# Frontend
+cp packages/web/.env.example packages/web/.env
+```
+
+**Key variables**:
+
+| Variable          | Description                        | Example                     |
+| ----------------- | ---------------------------------- | --------------------------- |
+| `PORT`            | Backend server port                | `4000`                      |
+| `MONGO_URI`       | MongoDB connection string          | `mongodb://localhost:27017` |
+| `JWT_SECRET`      | Secret for signing tokens          | `your-secret-key`           |
+| `HTTPS_CERT_PATH` | Path to SSL certificate (optional) | `./ssl/server.cert`         |
+| `HTTPS_KEY_PATH`  | Path to SSL private key (optional) | `./ssl/server.key`          |
+
+For HTTPS local development, place your certificates in `ssl/` and reference them in the environment.
 
 ---
 
@@ -312,18 +362,18 @@ See [`docker-compose.yml`](docker-compose.yml) for configuration.
 
 | Feature                       | Status      | Details                            |
 | ----------------------------- | ----------- | ---------------------------------- |
-| TypeScript Project References | ✅ Complete | Type-safe cross-package imports    |
+| TypeScript Project References | ✅ Complete | Type‑safe cross‑package imports    |
 | JWT Authentication            | ✅ Complete | Login, logout, token validation    |
 | Redux State Management        | ✅ Complete | Typed actions, reducers, selectors |
-| Responsive UI                 | ✅ Complete | Mobile-friendly card grid          |
+| Responsive UI                 | ✅ Complete | Mobile‑friendly card grid          |
 | Unit Testing                  | ✅ Complete | Jest + React Testing Library       |
 | E2E Testing                   | ✅ Complete | Playwright auth flow tests         |
-| HTTPS Development             | ✅ Complete | Self-signed certificates           |
-| Docker Support                | ✅ Complete | docker-compose.yml                 |
-| Git Hooks                     | ✅ Complete | Husky pre-commit linting           |
+| HTTPS Development             | ✅ Complete | Self‑signed certificates           |
+| Docker Support                | ✅ Complete | `docker-compose.yml` (MongoDB)     |
+| Git Hooks                     | ✅ Complete | Husky pre‑commit linting           |
 | CI/CD Pipeline                | 🟡 Planned  | GitHub Actions                     |
 | Dark Mode                     | 🟡 Planned  | Theme toggle                       |
-| Role-Based Access             | 🟡 Planned  | Admin/user permissions             |
+| Role‑Based Access             | 🟡 Planned  | Admin/user permissions             |
 
 ---
 
@@ -338,7 +388,7 @@ See [`docker-compose.yml`](docker-compose.yml) for configuration.
 5. **Make changes** following existing patterns
 6. **Test**: `npm run test && npx playwright test`
 7. **Type check**: `npm run typecheck`
-8. **Commit**: Husky will run pre-commit hooks
+8. **Commit**: Husky will run pre‑commit hooks
 9. **Push** and create **Pull Request**
 
 ### Code Standards
@@ -368,7 +418,7 @@ refactor: extract Header component from App
 
 | Issue                             | Solution                                                  |
 | --------------------------------- | --------------------------------------------------------- |
-| 🔒 Browser "Not Secure" warning   | Install self-signed cert or click "Advanced → Proceed"    |
+| 🔒 Browser "Not Secure" warning   | Install self‑signed cert or click "Advanced → Proceed"    |
 | 📦 Module not found: @demo/common | Run `npm run rebuild` to compile shared package           |
 | 🔄 Proxy errors in dev            | Verify `secure: false` in Webpack proxy config            |
 | 🧊 Stale build artifacts          | Run `npm run clean && npm run rebuild`                    |
@@ -419,6 +469,50 @@ See [LICENSE](LICENSE) for full terms.
 
 > 💡 **Pro Tip**: Star ⭐ this repo if you found it helpful! It helps others discover the project.
 
-**Last Updated**: February 22, 2026  
-**Version**: 2.1.0  
-**Status**: ✅ Production-Ready
+**Last Updated**: February 22, 2026
+**Version**: 2.1.0
+**Status**: ✅ Production‑Ready
+
+---
+
+## ✅ What Changed
+
+| Before                        | After                                        | Why                                                         |
+| ----------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| `## Overview` (plain heading) | `- [🎯 Overview](#overview)` (bulleted link) | Creates clickable TOC entries                               |
+| No anchor links               | Proper GitHub-compatible anchors             | Emojis stripped in auto-IDs: `## 🎯 Overview` → `#overview` |
+| Broken TOC                    | Working navigation                           | Click any item → scrolls to section                         |
+
+---
+
+## 🧪 Verify It Works
+
+1. **Push to GitHub**
+2. **Open README on GitHub.com** (not VS Code preview)
+3. **Click each TOC link** — should scroll smoothly to the section
+4. **Check URL bar** — should update with anchor (e.g., `#authentication-flow`)
+
+---
+
+## 🔗 Anchor Reference Table
+
+| Heading                       | Auto-Generated ID        |
+| ----------------------------- | ------------------------ |
+| `## 🎯 Overview`              | `#overview`              |
+| `## 🏗️ Architecture`          | `#architecture`          |
+| `## 🚀 Quick Start`           | `#quick-start`           |
+| `## 📦 Packages`              | `#packages`              |
+| `## 🧪 Testing`               | `#testing`               |
+| `## 🛠️ Development Commands`  | `#development-commands`  |
+| `## 🔐 Authentication Flow`   | `#authentication-flow`   |
+| `## 🎨 Design System`         | `#design-system`         |
+| `## 🐳 Docker Support`        | `#docker-support`        |
+| `## 🔧 Environment Variables` | `#environment-variables` |
+| `## 📊 Project Status`        | `#project-status`        |
+| `## 🤝 Contributing`          | `#contributing`          |
+| `## 🛠️ Troubleshooting`       | `#troubleshooting`       |
+| `## 📄 License`               | `#license`               |
+
+> 💡 **Rule**: GitHub strips emojis, lowercases, and replaces spaces with hyphens.
+
+---
