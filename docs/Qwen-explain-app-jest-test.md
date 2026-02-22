@@ -1,8 +1,8 @@
-# 🎉 All Tests Passing!
+# 🎉 All Tests Passing
 
 Excellent! Your Jest test suite is now working perfectly:
 
-```
+```bash
 ✅ Test Suites: 1 passed, 1 total
 ✅ Tests:       8 passed, 8 total
 ```
