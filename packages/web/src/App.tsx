@@ -1,9 +1,14 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers, LOGOUT, FormattedUser } from "./store/actions";
+import { fetchUsers, LOGOUT } from "./store/actions";
 import { APP_NAME } from "@demo/common";
 import { AppDispatch, RootState } from "./store";
 import LoginPage from "./LoginPage";
+import { LoadingState } from "./components/states/LoadingState";
+import { ErrorState } from "./components/states/ErrorState";
+import { EmptyState } from "./components/states/EmptyState";
+import { UserList } from "./components/UserList";
+import { mainContainer } from "./styles/mainStyles";
 
 function App() {
   // ─────────────────────────────────────────────────────────────
@@ -149,128 +154,19 @@ function App() {
           Never show stale data while loading, always surface
           errors rather than showing a blank unexplained page
         ───────────────────────────────────────────────────────── */}
-      <main style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+      <main style={mainContainer}>
         {loading ? (
           // 🔄 Loading state: API call is in flight
-          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-            <div style={{ fontSize: "48px", marginBottom: "16px" }}>⏳</div>
-            <p>Loading users from backend...</p>
-          </div>
+          <LoadingState />
         ) : error ? (
           // ❌ Error state: network failure, API error, expired token etc.
-          <div
-            style={{
-              backgroundColor: "#fee",
-              border: "1px solid #fcc",
-              borderRadius: "8px",
-              padding: "20px",
-              color: "#c00",
-            }}
-          >
-            <div style={{ fontSize: "32px", marginBottom: "8px" }}>⚠️</div>
-            <p style={{ margin: 0, fontWeight: "500" }}>{error}</p>
-          </div>
+          <ErrorState message={error} />
         ) : users.length === 0 ? (
           // 🕳️ Empty state: request succeeded but no users returned
-          <div style={{ textAlign: "center", padding: "40px", color: "#999" }}>
-            <div style={{ fontSize: "48px", marginBottom: "16px" }}>🕳️</div>
-            <p>No users found.</p>
-          </div>
+          <EmptyState />
         ) : (
           // ✅ Success state: render the list of users
-          <div>
-            <h2 style={{ marginBottom: "24px", color: "#2c3e50" }}>
-              Users ({users.length})
-            </h2>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "grid",
-                gap: "16px",
-                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-              }}
-            >
-              {users.map((user: FormattedUser) => (
-                // Stable unique key — never use array index
-                <li
-                  key={user.raw.id}
-                  style={{
-                    backgroundColor: "white",
-                    padding: "20px",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                    border: "1px solid #e1e4e8",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "50%",
-                        backgroundColor: "#3498db",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "20px",
-                      }}
-                    >
-                      {user.raw.name?.charAt(0).toUpperCase() || "U"}
-                    </div>
-                    <div>
-                      <strong style={{ fontSize: "16px", color: "#2c3e50" }}>
-                        {user.formatted}
-                      </strong>
-                      <p
-                        style={{
-                          margin: "4px 0 0",
-                          color: "#7f8c8d",
-                          fontSize: "12px",
-                        }}
-                      >
-                        ID: {user.raw.id}
-                      </p>
-                    </div>
-                  </div>
-                  <details style={{ marginTop: "12px" }}>
-                    <summary
-                      style={{
-                        cursor: "pointer",
-                        color: "#3498db",
-                        fontSize: "12px",
-                      }}
-                    >
-                      View Raw Data
-                    </summary>
-                    <pre
-                      style={{
-                        marginTop: "8px",
-                        padding: "12px",
-                        backgroundColor: "#f8f9fa",
-                        borderRadius: "4px",
-                        fontSize: "11px",
-                        overflow: "auto",
-                        color: "#666",
-                      }}
-                    >
-                      {JSON.stringify(user.raw, null, 2)}
-                    </pre>
-                  </details>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <UserList users={users} />
         )}
       </main>
     </div>
