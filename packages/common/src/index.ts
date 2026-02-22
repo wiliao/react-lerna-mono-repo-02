@@ -3,7 +3,7 @@ export const APP_NAME = "Lerna Mono Demo (React 19)";
 
 // Shared types
 export interface User {
-  id: number | string;
+  id: number; // ✅ matches Mongoose schema exactly
   name: string;
 }
 

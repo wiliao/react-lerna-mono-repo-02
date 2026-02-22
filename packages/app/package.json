@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "start:dev": "ts-node src/index.ts",
+    "seed": "ts-node src/seed.ts",
     "build": "tsc -b",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
@@ -15,6 +16,10 @@
   "dependencies": {
     "@demo/common": "*",
     "cors": "^2.8.6",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mongoose": "^9.2.1"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.96"
   }
 }

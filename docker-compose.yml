@@ -1,0 +1,44 @@
+services:
+  # ─────────────────────────────────────────────────────────────
+  # 🍃 MongoDB
+  # ─────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:8.2
+    container_name: demo_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017" # expose to host for local dev tools (Compass etc.)
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo_data:/data/db # ✅ persist data across container restarts
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────
+  # 📦 Backend API
+  # ─────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: packages/app/Dockerfile
+    container_name: demo_app
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      ALLOWED_ORIGIN: http://localhost:3000
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin
+    depends_on:
+      mongo:
+        condition: service_healthy # ✅ wait for mongo to be ready before starting app
+
+volumes:
+  mongo_data: # named volume — survives container removal

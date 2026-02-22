@@ -28,12 +28,11 @@ describe("formatUser (unit test)", () => {
     expect(result).toBe("User: Alice (ID: 1)");
   });
 
-  // ✅ Test 2: Edge case - string ID (type flexibility)
-  it("formats user with string ID", () => {
-    const user: User = { id: "abc-123", name: "Bob" };
+  // ✅ Test 2: Edge case - number ID
+  it("formats user with numeric ID", () => {
+    const user: User = { id: 2, name: "Bob" };
     const result = formatUser(user);
-
-    expect(result).toBe("User: Bob (ID: abc-123)");
+    expect(result).toBe("User: Bob (ID: 2)");
   });
 
   // ✅ Test 3: Edge case - special characters in name

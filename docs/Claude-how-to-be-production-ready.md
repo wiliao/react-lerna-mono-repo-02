@@ -7,6 +7,7 @@ Based on everything in your project, here's what's needed grouped by priority:
 ## 🔴 Critical (Before Any Real Traffic)
 
 **Environment variables** — secrets should never be hardcoded or committed to git:
+
 ```bash
 # packages/app/.env.example (commit this)
 PORT=4000
@@ -18,6 +19,7 @@ PORT=4000
 ALLOWED_ORIGIN=https://yourproductiondomain.com
 NODE_ENV=production
 ```
+
 Add `dotenv` to load them: `npm install dotenv` then `import "dotenv/config"` at the top of `index.ts`.
 
 **Build step for the backend** — your app currently runs `node dist/index.js` which means TypeScript must be compiled first. Ensure your CI pipeline runs `tsc` before deploying, and that `dist/` is in `.gitignore`.
@@ -29,24 +31,29 @@ Add `dotenv` to load them: `npm install dotenv` then `import "dotenv/config"` at
 ## 🟠 Important (Security & Reliability)
 
 **Rate limiting** — without it, your API is trivially DoS-able:
+
 ```typescript
 // app.ts
 import rateLimit from "express-rate-limit";
 
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                  // limit each IP to 100 requests per window
-  message: { error: "Too many requests, please try again later" },
-}));
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per window
+    message: { error: "Too many requests, please try again later" },
+  }),
+);
 ```
 
 **Helmet** — sets secure HTTP headers in one line:
+
 ```typescript
 import helmet from "helmet";
 app.use(helmet()); // sets X-Content-Type-Options, HSTS, CSP, and more
 ```
 
 **Input size limiting** — prevents large payload attacks:
+
 ```typescript
 app.use(express.json({ limit: "10kb" })); // reject bodies over 10kb
 ```
@@ -58,12 +65,13 @@ app.use(express.json({ limit: "10kb" })); // reject bodies over 10kb
 ## 🟡 Operational (Observability & Deployment)
 
 **Health check improvements** — your current `/health` returns `{ status: "ok" }` which is good, but production health checks benefit from more signal:
+
 ```typescript
 app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
     service: APP_NAME,
-    uptime: process.uptime(),       // seconds since process started
+    uptime: process.uptime(), // seconds since process started
     timestamp: new Date().toISOString(),
   });
 });
@@ -80,6 +88,7 @@ app.get("/health", (_req, res) => {
 ## 🟢 Frontend (React/Redux)
 
 **API base URL via environment variable** — the hardcoded `http://localhost:4000` in `actions.tsx` will break in production:
+
 ```typescript
 // packages/web/.env
 REACT_APP_API_URL=http://localhost:4000
@@ -90,6 +99,7 @@ const response = await fetch(`${API_URL}/api/users`);
 ```
 
 **Error boundary** — catches React render errors that Redux can't catch:
+
 ```typescript
 // ErrorBoundary.tsx
 import { Component, ReactNode } from "react";
@@ -107,6 +117,7 @@ class ErrorBoundary extends Component
   }
 }
 ```
+
 Wrap `<App />` in `index.tsx` with `<ErrorBoundary>`.
 
 **Production webpack build** — ensure `packages/web/package.json` has a `build` script: `webpack --mode production`. Production mode enables minification, tree shaking, and removes React's dev warnings — bundle size typically drops 60-70%.
@@ -130,17 +141,17 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
-      - run: npm run build        # compile TypeScript
-      - run: npm run test:unit    # lerna run test
+      - run: npm run build # compile TypeScript
+      - run: npm run test:unit # lerna run test
       - run: npx playwright install --with-deps
-      - run: npm run test:e2e     # playwright
+      - run: npm run test:e2e # playwright
 ```
 
 ---
 
 ## Priority Order
 
-```
+```bash
 1. Environment variables + .gitignore   ← security baseline
 2. Helmet + rate limiting               ← security hardening
 3. Database (replace in-memory array)   ← data persistence
