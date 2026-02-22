@@ -75,8 +75,6 @@ react-lerna-mono-repo-02/
 └── playwright.config.ts
 ```
 
-````
-
 ### Package Dependencies
 
 ```mermaid
@@ -559,4 +557,3 @@ See [LICENSE](LICENSE) for full terms.
 **Last Updated**: February 22, 2026
 **Version**: 2.1.0
 **Status**: ✅ Production‑Ready
-````
