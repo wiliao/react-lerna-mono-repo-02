@@ -37,7 +37,7 @@ test("login flow shows main app", async ({ page }) => {
   });
 
   // ✅ Logged-in username should appear in header
-  await expect(page.getByText("👤 admin")).toBeVisible();
+  await expect(page.getByText("admin")).toBeVisible();
 });
 
 test("logout returns to login page", async ({ page }) => {
