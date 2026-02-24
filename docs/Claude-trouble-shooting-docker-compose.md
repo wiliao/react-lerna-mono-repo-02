@@ -59,3 +59,10 @@ The full journey from start to finish:
 6. `docker-compose down -v` — wiped stale volume for clean MongoDB init
 
 **E2E test fixes:** 7. Copied `.env` to `packages/app/` — so `dotenv` could find credentials when seed runs from that directory 8. Fixed `"👤 admin"` → `"admin"` — matched the actual DOM output in the header
+
+Yes, you still need the root `.env` for:
+
+1. **`docker-compose up`** — it reads `MONGO_USER`, `MONGO_PASSWORD`, and `MONGO_DB` from the root `.env` to configure both the MongoDB container and the app container's `MONGO_URI`
+2. **`npm run test:e2e`** — Playwright's `webServer` starts `npm run start:app` (backend) which needs `MONGO_URI`, `PORT`, etc.
+
+The `packages/app/.env` is only needed for the seed script since it runs with `packages/app` as the working directory. Both files are needed.
